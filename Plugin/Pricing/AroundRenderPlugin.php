@@ -57,9 +57,17 @@ class AroundRenderPlugin
         if (!$this->helper->getConfigValue(self::ENABLED_DISPLAY_BELOW_PRICE_XML)) {
             return $returnValue;
         }
-        if (trim($returnValue) != '') {
-            $block = $subject->getLayout()->getBlock('magesetup.product.price.details');
-            if ($block) {
+        // if there is anything returned we should render the price details
+        $shouldRender = trim($returnValue) != '';
+        // tier price returns JavaScript template, so check if item actually
+        // has tier prices
+        if ($priceCode === 'tier_price') {
+            $shouldRender = false;
+        }
+
+        if ($shouldRender) {
+           $block = $subject->getLayout()->getBlock('magesetup.product.price.details');
+                if ($block) {
                 $block->setSaleableItem($saleableItem);
                 $returnValue = $returnValue . $block->toHtml();
             }
